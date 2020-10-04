@@ -20,6 +20,14 @@ architecture Behavioral of keyboardVhdl is
 	-- Component Declarations
 	------------------------------------------------------------------------
 
+	COMPONENT seven_seg_4bit
+	PORT
+	(
+		Number		:	 IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+		SevenSegment		:	 OUT STD_LOGIC_VECTOR(7 DOWNTO 0)
+	);
+	END COMPONENT;
+	
 	------------------------------------------------------------------------
 	-- Signal Declarations
 	------------------------------------------------------------------------
@@ -37,6 +45,14 @@ architecture Behavioral of keyboardVhdl is
 	------------------------------------------------------------------------
 
 	begin
+	
+	-- seven segment instance
+	inst_seven_seg: seven_seg_4bit PORT MAP
+	(
+		Number => MUXOUT,
+		SevenSegment => sseg
+	);
+	
 	--Divide the master clock down to a lower frequency--
 	CLKDivider: Process (CLK)
 	begin
@@ -90,49 +106,7 @@ architecture Behavioral of keyboardVhdl is
 
 	MUXOUT <=  WaitReg(7 downto 4) when sclk = '1' else
 				  WaitReg(3 downto 0);
-				  
-	--seven seg - 
-	
-	with MUXOUT select
-		sseg(7 downto 1) <= -- 1 is off for a segment
-			"0000001" when "0000", --0
-			"1001111" when "0001", --1
-			"0010010" when "0010", --2
-			"0000110" when "0011", --3
-			"1001100" when "0100", --4
-			"0100100" when "0101", --5
-			"0100000" when "0110", --6
-			"0001111" when "0111", --7
-			"0000000" when "1000", --8
-			"0000100" when "1001", --9
-			"0001000" when "1010", --a
-			"1100000" when "1011", --b
-			"0110001" when "1100", --c
-			"1000010" when "1101", --d
-			"0110000" when "1110", --e
-			"0111000" when others; --f
-		sseg(0) <= '1'; --decimal point
-	
-	--Seven Segment Decoder--
---	sseg <=	"11000000" when MUXOUT = "0000" else
---			"11111001" when MUXOUT = "0001" else
---			"10100100" when MUXOUT = "0010" else
---			"0110000" when MUXOUT = "0011" else
---			"0011001" when MUXOUT = "0100" else
---			"0010010" when MUXOUT = "0101" else
---			"0000010" when MUXOUT = "0110" else
---			"1111000" when MUXOUT = "0111" else
---			"0000000" when MUXOUT = "1000" else
---			"0010000" when MUXOUT = "1001" else
---			"0001000" when MUXOUT = "1010" else
---			"0000011" when MUXOUT = "1011" else
---			"1000110" when MUXOUT = "1100" else
---			"0100001" when MUXOUT = "1101" else
---			"0000110" when MUXOUT = "1110" else
---			"0001110" when MUXOUT = "1111" else
---			"1111111";
-			
-	--sseg <= "00000001";
+
 
 	--Anode Driver--
 	an(3) <= '1'; an(2) <= '1'; --disable first two seven-segment decoders.
